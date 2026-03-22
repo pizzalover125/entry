@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import QRCode from 'qrcode';
 
+import { registrationQrCodeOptions } from '$lib/registration';
 import { getRegistrationById } from '$lib/server/database';
 
 export async function load({ params, url }) {
@@ -11,14 +12,7 @@ export async function load({ params, url }) {
 	}
 
 	const registrationUrl = `${url.origin}/registration/${registration.registrationId}`;
-	const qrCodeDataUrl = await QRCode.toDataURL(registrationUrl, {
-		margin: 1,
-		width: 320,
-		color: {
-			dark: '#111111',
-			light: '#f5f2eb'
-		}
-	});
+	const qrCodeDataUrl = await QRCode.toDataURL(registrationUrl, registrationQrCodeOptions);
 
 	return {
 		registrationId: registration.registrationId,

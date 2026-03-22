@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 
 import { createRegistration, getEventById } from '$lib/server/database';
+import { sendRegistrationConfirmationEmail } from '$lib/server/email';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -118,6 +119,19 @@ export const actions = {
 				message: 'We could not save the registration. Please try again.',
 				values
 			});
+		}
+
+		try {
+			await sendRegistrationConfirmationEmail({
+				eventName: event.name,
+				registrationId,
+				registrationUrl: `${url.origin}/registration/${registrationId}`,
+				studentName: values.name,
+				studentEmail: values.email,
+				parentEmail: values.parentEmail
+			});
+		} catch (error) {
+			console.error('Failed to send registration confirmation email', error);
 		}
 
 		redirect(303, `/registration/${registrationId}`);
